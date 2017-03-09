@@ -34,11 +34,17 @@ public class PlayerController : MonoBehaviour {
 
 	void Move (float h, float v)
 	{
+
+		float moveSpeed = speed;
+
+		if (Input.GetKey (KeyCode.LeftShift)) {
+			moveSpeed = speed * 2;
+		}
 		// Set the movement vector based on the axis input.
 		movement.Set (h, 0f, v);
 
 		// Normalise the movement vector and make it proportional to the speed per second.
-		movement = movement.normalized * speed * Time.deltaTime;
+		movement = movement.normalized * moveSpeed * Time.deltaTime;
 
 		// Move the player to it's current position plus the movement.
 		playerRigidbody.MovePosition (transform.position + movement);
