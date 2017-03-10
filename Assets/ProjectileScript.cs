@@ -18,16 +18,19 @@ public class ProjectileScript : MonoBehaviour {
 	}
 
 	void OnCollisionEnter (Collision col) {
+
 		Vector3 explosionPos = transform.position;
 		Collider[] colliders = Physics.OverlapSphere(explosionPos, radius);
 		foreach (Collider hit in colliders) {
 			Rigidbody rb = hit.GetComponent<Rigidbody>();
 
-			if (rb != null) {
+			if (rb != null && hit != gameObject) {
 				Debug.Log ("Pop");
 				rb.AddExplosionForce (power, explosionPos, radius, 3.0F);
 			}
 
 		}
+
+		Destroy (gameObject);
 	}
 }

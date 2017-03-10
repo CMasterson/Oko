@@ -11,12 +11,23 @@ public class PlayerController : MonoBehaviour {
 	int floorMask;                      // A layer mask so that a ray can be cast just at gameobjects on the floor layer.
 	float camRayLength = 100f;          // The length of the ray from the camera into the scene.
 
+	float attackTime;
+
+	public GameObject projectileSpawnPoint;
+	public GameObject projectilePrefab;
+
+	public float rangedAttackDelay = 1.0f;
+	public float meleeAttackDelay = 1.0f;
+
+	public float projectileSpeed = 30.0f;
 
 	void Awake () {
 		// Create a layer mask for the floor layer.
 		floorMask = LayerMask.GetMask ("Floor");
 
 		playerRigidbody = GetComponent <Rigidbody> ();
+
+		attackTime = Time.time;
 	}
 	
 	void FixedUpdate ()
@@ -28,6 +39,7 @@ public class PlayerController : MonoBehaviour {
 		// Move the player around the scene.
 		Move (h, v);
 		Turning ();
+		Attack ();
 	}
 
 
@@ -59,7 +71,7 @@ public class PlayerController : MonoBehaviour {
 		RaycastHit floorHit;
 
 		// Perform the raycast and if it hits something on the floor layer...
-		if(Physics.Raycast (camRay, out floorHit, camRayLength, floorMask))
+		if(Physics.Raycast (camRay, out floorHit, camRayLength))
 		{
 			// Create a vector from the player to the point on the floor the raycast from the mouse hit.
 			Vector3 playerToMouse = floorHit.point - transform.position;
@@ -72,6 +84,23 @@ public class PlayerController : MonoBehaviour {
 
 			// Set the player's rotation to this new rotation.
 			playerRigidbody.MoveRotation (newRotation);
+		}
+	}
+	void Attack () {
+
+		if (Time.time >= attackTime) {
+			if (Input.GetKeyDown (KeyCode.Mouse0)) {
+				attackTime = Time.time + meleeAttackDelay;
+			}
+			if (Input.GetKeyDown (KeyCode.Mouse1)) {
+				GameObject projectile = Instantiate (projectilePrefab);
+				projectile.transform.position = transform.Find("ProjectileEmitter").transform.position;
+				projectile.GetComponent<Rigidbody> ().velocity = transform.forward * projectileSpeed;
+
+				attackTime = Time.time + rangedAttackDelay;
+			}
+
+
 		}
 	}
 }
