@@ -13,13 +13,18 @@ public class PlayerController : MonoBehaviour {
 
 	float attackTime;
 
+	List<Rigidbody> meleeTargets;
+
 	public GameObject projectileSpawnPoint;
 	public GameObject projectilePrefab;
 
 	public float rangedAttackDelay = 1.0f;
 	public float meleeAttackDelay = 1.0f;
+	public float meleeKnockback = 500.0f;
 
 	public float projectileSpeed = 30.0f;
+
+
 
 	void Awake () {
 		// Create a layer mask for the floor layer.
@@ -28,9 +33,11 @@ public class PlayerController : MonoBehaviour {
 		playerRigidbody = GetComponent <Rigidbody> ();
 
 		attackTime = Time.time;
+
+		meleeTargets = new List<Rigidbody> ();
 	}
 	
-	void FixedUpdate ()
+	void FixedUpdate ()	
 	{
 		// Store the input axes.
 		float h = Input.GetAxisRaw ("Horizontal");
@@ -88,8 +95,22 @@ public class PlayerController : MonoBehaviour {
 	}
 	void Attack () {
 
+		Debug.Log (meleeTargets.Count);
 		if (Time.time >= attackTime) {
 			if (Input.GetKeyDown (KeyCode.Mouse0)) {
+
+				foreach (Rigidbody rb in meleeTargets) {
+
+					Transform tf = rb.GetComponent<Transform> ();
+
+					Vector3 force = tf.position - transform.position;
+					force.Normalize ();
+
+					force *= meleeKnockback;
+
+					rb.AddForce (force);
+				}
+
 				attackTime = Time.time + meleeAttackDelay;
 			}
 			if (Input.GetKeyDown (KeyCode.Mouse1)) {
@@ -99,8 +120,24 @@ public class PlayerController : MonoBehaviour {
 
 				attackTime = Time.time + rangedAttackDelay;
 			}
+		}
+	}
 
+	void OnTriggerEnter(Collider other) {
 
+		Rigidbody rb = other.GetComponent<Rigidbody> ();
+		if (other.tag == "Enemy") {
+			if (!meleeTargets.Contains (rb)) {
+				meleeTargets.Add (rb);
+			}
+		}
+	}
+
+	void OnTriggerExit(Collider other) {
+		Rigidbody rb = other.GetComponent<Rigidbody> ();
+
+		if (meleeTargets.Contains (rb)) {
+			meleeTargets.Remove (rb);
 		}
 	}
 }
