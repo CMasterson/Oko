@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour {
 
 	Vector3 movement;                   // The vector to store the direction of the player's movement.
 	Rigidbody playerRigidbody;          // Reference to the player's rigidbody.
-	int floorMask;                      // A layer mask so that a ray can be cast just at gameobjects on the floor layer.
+	int floorMask;
 	float camRayLength = 100f;          // The length of the ray from the camera into the scene.
 
 	float attackTime;
@@ -22,6 +22,9 @@ public class PlayerController : MonoBehaviour {
 	public float meleeAttackDelay = 1.0f;
 	public float meleeKnockback = 500.0f;
 
+	public float meleeAttackDamage = 20.0f;
+	public float rangedAttackDamage = 10.0f;
+
 	public float projectileSpeed = 30.0f;
 
 
@@ -31,6 +34,8 @@ public class PlayerController : MonoBehaviour {
 		floorMask = LayerMask.GetMask ("Floor");
 
 		playerRigidbody = GetComponent <Rigidbody> ();
+
+
 
 		attackTime = Time.time;
 
@@ -53,7 +58,6 @@ public class PlayerController : MonoBehaviour {
 
 	void Move (float h, float v)
 	{
-
 		float moveSpeed = speed;
 
 		if (Input.GetKey (KeyCode.LeftShift)) {
@@ -105,18 +109,23 @@ public class PlayerController : MonoBehaviour {
 
 					Vector3 force = tf.position - transform.position;
 					force.Normalize ();
-
 					force *= meleeKnockback;
 
 					rb.AddForce (force);
+					rb.GetComponentInParent<Damagable> ().TakeDamage (meleeAttackDamage);
 				}
 
 				attackTime = Time.time + meleeAttackDelay;
+			
 			}
+			
 			if (Input.GetKeyDown (KeyCode.Mouse1)) {
+							
 				GameObject projectile = Instantiate (projectilePrefab);
+				
 				projectile.transform.position = transform.Find("ProjectileEmitter").transform.position;
 				projectile.GetComponent<Rigidbody> ().velocity = transform.forward * projectileSpeed;
+				projectile.GetComponent<ProjectileScript> ().damage = rangedAttackDamage;
 
 				attackTime = Time.time + rangedAttackDelay;
 			}
