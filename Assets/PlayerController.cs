@@ -18,8 +18,8 @@ public class PlayerController : MonoBehaviour {
 	public GameObject projectileSpawnPoint;
 	public GameObject projectilePrefab;
 
-	public float rangedAttackDelay = 1.0f;
-	public float meleeAttackDelay = 1.0f;
+	public float rangedAttackDelay = 0.5f;
+	public float meleeAttackDelay = 0.1f;
 	public float meleeKnockback = 500.0f;
 
 	public float meleeAttackDamage = 20.0f;
@@ -99,7 +99,6 @@ public class PlayerController : MonoBehaviour {
 	}
 	void Attack () {
 
-		Debug.Log (meleeTargets.Count);
 		if (Time.time >= attackTime) {
 			if (Input.GetKeyDown (KeyCode.Mouse0)) {
 
